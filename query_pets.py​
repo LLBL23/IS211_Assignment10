@@ -1,3 +1,52 @@
+import argparse
+import sqlite3 as lite
+
+con = lite.connect('pets.db')
+cur = con.cursor()
+
+#id = input("Enter a person's ID number. To exit enter -1: ")
+#print(id)
+#query = db_query(id)
+#id.db_query()
+
+
+
+def db_query():
+    """
+    Print data associated with person ID number
+    :return: Data from database
+    """
+    while True:
+        id_index = input("Enter a person's ID number. To exit enter -1: ")
+        index = int(id_index)
+        to_search = index -1
+        if index == -1:
+            break
+        if index == 0:
+            print("Invalid Entry.")
+
+        else:
+            try:
+                cur.execute("SELECT * FROM person")  # retrieve data from person table
+                person_rows = cur.fetchall()
+                person_output = person_rows[to_search]
+                print(f"{person_output[1]} {person_output[2]}, {person_output[3]} years old")
+                cur.execute(f"SELECT * from person_pet WHERE person_id = {index}")  # retrieve data from person_pet table
+                person_petRow = cur.fetchall()
+                cur.execute("SELECT * FROM pet")  # retrieve data from pet table
+                pet_rows = cur.fetchall()
+                for i in person_petRow:  # separate person_id and pet_id to look up
+                    person_lookup = i[0] - 1
+                    pet_lookup = i[1] - 1
+                    person_output = person_rows[person_lookup]
+                    pet_output = pet_rows[pet_lookup]
+                    print(f"{person_output[1]} {person_output[2]} owned {pet_output[1]}, a {pet_output[2]}, that was {pet_output[3]} year(s) old")
+
+            except IndexError:
+                print("No ID matching that number.")
+    con.close()
+
+
 
 if __name__ == "__main__":
-    pass
+    db_query()
